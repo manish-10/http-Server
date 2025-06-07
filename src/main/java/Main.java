@@ -9,8 +9,8 @@ public class Main {
   public static void main(String[] args) {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
-    RequestHandler req = new RequestHandler();
-    ResponseHandler res = new ResponseHandler();
+      RequestHandler req;
+      ResponseHandler res;
     // Uncomment this block to pass the first stage
     //
      try {
@@ -27,11 +27,13 @@ public class Main {
            String requestMessage;
 
            // read req and validate path
-           requestMessage = in.readLine();
-           boolean isUrlPathValid = req.validateURLPath(requestMessage);
+           req = new RequestHandler(in);
+           boolean isUrlPathValid = req.validateURLPath();
+           String pathVariable = req.getPathVariable();
 
            //send response message
-           res.sendResponse(out, isUrlPathValid);
+           res = new ResponseHandler();
+           res.sendResponse(out, isUrlPathValid, pathVariable);
 
            System.out.println("accepted new connection");
          } catch (IOException e) {
