@@ -9,7 +9,8 @@ public class Main {
   public static void main(String[] args) {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
-
+    RequestHandler req = new RequestHandler();
+    ResponseHandler res = new ResponseHandler();
     // Uncomment this block to pass the first stage
     //
      try {
@@ -21,13 +22,16 @@ public class Main {
 
            Socket clientSocket = serverSocket.accept(); // Wait for connection from client.
 
-           String requestMessage, responseMessage;
-
            BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
            PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+           String requestMessage;
 
-           responseMessage = "HTTP/1.1 200 OK\r\n\r\n";
-           out.println(responseMessage);
+           // read req and validate path
+           requestMessage = in.readLine();
+           boolean isUrlPathValid = req.validateURLPath(requestMessage);
+
+           //send response message
+           res.sendResponse(out, isUrlPathValid);
 
            System.out.println("accepted new connection");
          } catch (IOException e) {
