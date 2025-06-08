@@ -30,10 +30,11 @@ public class Main {
            req = new RequestHandler(in);
            boolean isUrlPathValid = req.validateURLPath();
            String pathVariable = req.getPathVariable();
+           String userAgentHeaderContent = req.getHeaderContent("user-agent");
 
            //send response message
            res = new ResponseHandler();
-           res.sendResponse(out, isUrlPathValid, pathVariable);
+           res.sendResponse(out, isUrlPathValid, pathVariable, userAgentHeaderContent);
 
            System.out.println("accepted new connection");
          } catch (IOException e) {
