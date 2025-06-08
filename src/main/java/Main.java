@@ -9,8 +9,6 @@ public class Main {
   public static void main(String[] args) {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     System.out.println("Logs from your program will appear here!");
-      RequestHandler req;
-      ResponseHandler res;
     // Uncomment this block to pass the first stage
     //
      try {
@@ -20,25 +18,35 @@ public class Main {
            // ensures that we don't run into 'Address already in use' errors
            serverSocket.setReuseAddress(true);
 
-           Socket clientSocket = serverSocket.accept(); // Wait for connection from client.
-
-           BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-           PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
-           String requestMessage;
-
-           // read req and validate path
-           req = new RequestHandler(in);
-           boolean isUrlPathValid = req.validateURLPath();
-           String pathVariable = req.getPathVariable();
-           String userAgentHeaderContent = req.getHeaderContent("user-agent");
-
-           //send response message
-           res = new ResponseHandler();
-           res.sendResponse(out, isUrlPathValid, pathVariable, userAgentHeaderContent);
-
-           System.out.println("accepted new connection");
+           while (true) {
+               Socket clientSocket = serverSocket.accept(); // Wait for connection from client.
+                new Thread(() -> handleClient(clientSocket)).start();
+           }
          } catch (IOException e) {
            System.out.println("IOException: " + e.getMessage());
          }
+  }
+  private static void handleClient(Socket clientSocket) {
+      RequestHandler req;
+      ResponseHandler res;
+    try{
+        BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
+        String requestMessage;
+
+        // read req and validate path
+        req = new RequestHandler(in);
+        boolean isUrlPathValid = req.validateURLPath();
+        String pathVariable = req.getPathVariable();
+        String userAgentHeaderContent = req.getHeaderContent("user-agent");
+
+        //send response message
+        res = new ResponseHandler();
+        res.sendResponse(out, isUrlPathValid, pathVariable, userAgentHeaderContent);
+
+        System.out.println("accepted new connection");
+    } catch (Exception e) {
+        throw new RuntimeException(e);
+    }
   }
 }
